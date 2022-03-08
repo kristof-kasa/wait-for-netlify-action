@@ -116,6 +116,10 @@ const run = async () => {
       core.setFailed('Required field `site_id` was not provided');
     }
 
+    if (extraHeaders) {
+      console.log(`The following headers are in use: ${JSON.stringify(headers, null, 2)}`)
+    }
+
     console.log(`Waiting for Netlify to create a deployment for git SHA ${commitSha}`);
     const commitDeployment = await waitForDeployCreation(
       `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
