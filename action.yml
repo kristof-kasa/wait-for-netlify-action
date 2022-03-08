@@ -10,6 +10,9 @@ inputs:
   max_timeout:
     description: "The max time to wait after the deployment is ready for a valid HTTP status code."
     required: false
+  request_headers:
+    description: "Stringified HTTP headers to send with the request."
+    required: false
 outputs:
   deploy_id:
     description: "The Netlify deployment ID"

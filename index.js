@@ -75,11 +75,13 @@ const waitForReadiness = (url, MAX_TIMEOUT) => {
   });
 };
 
-const waitForUrl = async (url, MAX_TIMEOUT) => {
+const waitForUrl = async (url, headers, MAX_TIMEOUT) => {
   const iterations = MAX_TIMEOUT / 3;
   for (let i = 0; i < iterations; i++) {
     try {
-      await axios.get(url);
+      await axios.get(url, {
+        headers
+      });
       return;
     } catch (e) {
       console.log(`URL ${url} unavailable, retrying...`);
@@ -99,12 +101,17 @@ const run = async () => {
     const MAX_READY_TIMEOUT = Number(core.getInput('max_timeout')) || 60;
     const siteId = core.getInput('site_id');
 
+    const extraHeaders = core.getInput("request_headers");
+    const headers = !extraHeaders ? {} : JSON.parse(extraHeaders)
+
     if (!netlifyToken) {
       core.setFailed('Please set NETLIFY_TOKEN env variable to your Netlify Personal Access Token secret');
     }
+
     if (!commitSha) {
       core.setFailed('Could not determine GitHub commit');
     }
+
     if (!siteId) {
       core.setFailed('Required field `site_id` was not provided');
     }
@@ -128,7 +135,7 @@ const run = async () => {
     );
 
     console.log(`Waiting for a 200 from: ${url}`);
-    await waitForUrl(url, MAX_READY_TIMEOUT);
+    await waitForUrl(url, headers, MAX_READY_TIMEOUT);
   } catch (error) {
     core.setFailed(typeof error === 'string' ? error : error.message);
   }
